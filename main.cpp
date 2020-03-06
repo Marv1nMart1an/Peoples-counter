@@ -12,18 +12,10 @@ int thresh = 100;
 int max_thresh = 255;
 RNG rng(12345);
 
-static void help(char** argv)
-{
-    printf("\n"
-           "This program demonstrated a simple method of connected components clean up of background subtraction\n"
-           "When the program starts, it begins learning the background.\n"
-           "You can toggle background learning on and off by hitting the space bar.\n"
-           "Call\n"
-           "%s [video file, else it reads camera 0]\n\n", argv[0]);
-}
 static void refineSegments(const Mat& img, Mat& mask, Mat& dst)
 {
-    
+    Point crossingLine[2];
+
     int niters = 3;
     vector<vector<Point> > contours;
     vector<Vec4i> hierarchy;
@@ -72,7 +64,7 @@ static void refineSegments(const Mat& img, Mat& mask, Mat& dst)
         Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
 //        drawContours( drawing, contours_poly, i, color, 1, 8, vector<Vec4i>(), 0, Point() );
         rectangle( drawing, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );
-//        circle( drawing, center[i], (int)radius[i], color, 2, 8, 0 );
+
 
         namedWindow( "Contours", WINDOW_AUTOSIZE );
         imshow( "Contours", drawing );
@@ -94,11 +86,7 @@ int main(int argc, char** argv)
     VideoCapture cap;
     bool update_bg_model = true;
     CommandLineParser parser(argc, argv, "{help h||}{@input||}");
-    if (parser.has("help"))
-    {
-        help(argv);
-        return 0;
-    }
+
     string input = parser.get<std::string>("@input");
     if (input.empty())
         cap.open("/Users/marvinmartian/Downloads/homosapiens.mp4");
